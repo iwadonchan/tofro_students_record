@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# HS-SIMS (High School Student Information Management System)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Next.js Application for managing student records with temporal data handling.
 
-Currently, two official plugins are available:
+## Tech Stack
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **UI**: Tailwind CSS + shadcn/ui
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+1. **Temporal Data Management**: Tracks history of changes (Address, Name, etc.) with effective dates.
+2. **Dual Name Support**: Toggles between Legal Name and Alias Name.
+3. **Bulk Promotion**: Spreadsheet-like interface for year-end processing.
+4. **Fast Search**: Client-side filtering for instant results.
 
-## React Compiler
+## Setup Instructions
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-## Expanding the ESLint configuration
+2. **Database Setup**
+   Ensure you have a PostgreSQL database running. Update `.env` with your connection string:
+   ```env
+   DATABASE_URL="postgresql://user:password@localhost:5432/hs_sims?schema=public"
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+3. **Initialize Database**
+   ```bash
+   npx prisma migrate dev --name init
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+4. **Run Development Server**
+   ```bash
+   npm run dev
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Key Components
+- `src/app/page.tsx`: Student Dashboard (KPIs & Search)
+- `src/app/students/[id]/page.tsx`: Student Detail (Profile & Timeline)
+- `src/app/promotion/page.tsx`: Bulk Promotion Interface
+- `src/lib/prisma.ts`: Prisma Client Singleton
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Notes on Architecture
+- **Data History**: Changes to critical fields are stored in `DataHistory` table. The UI displays the chronological timeline of these changes.
+- **Year-End Logic**: The `/api/promotion` endpoint handles the logic of copying current Enrollments to the next Fiscal Year.

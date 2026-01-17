@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id           String   @id @default(uuid())
+  sNumber      String   @unique // 学籍番号
+  legalName    String // 公的な氏名
+  aliasName    String? // 通称名
+  useAliasFlag Boolean  @default(false) // 通称名使用フラグ
+  birthday     DateTime
+  gender       String // 性別 (Could be enum, keeping string for flexibility as per MVP)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  enrollments   Enrollment[]
+  dataHistory   DataHistory[]
+  statusHistory StatusHistory[]
+
+  @@map("students")
+}
+
+model Enrollment {
+  id               String @id @default(uuid())
+  studentId        String
+  fiscalYear       Int // 年度 (e.g. 2025)
+  grade            Int // 学年
+  class            String // クラス (e.g. "1", "A")
+  attendanceNumber Int // 出席番号
+  status           String // 在籍ステータス (This might be redundant if StatusHistory tracks it, but good for snapshot)
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, fiscalYear]) // 一人の生徒は単一年度に一つの在籍レコード
+  @@map("enrollments")
+}
+
+model DataHistory {
+  id            String   @id @default(uuid())
+  studentId     String
+  fieldName     String // 変更項目名 (e.g., "address", "legalName")
+  oldValue      String? // 変更前の値
+  newValue      String? // 変更後の値
+  effectiveDate DateTime // 効力発生日
+  reason        String? // 変更理由
+  changedAt     DateTime @default(now()) // 操作日時
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@map("data_histories")
+}
+
+enum StudentStatus {
+  ACTIVE // 在籍
+  LEAVE // 休学
+  GRADUATED // 卒業
+  DROPOUT // 退学
+  TRANSFERRED // 転学
+}
+
+model StatusHistory {
+  id        String        @id @default(uuid())
+  studentId String
+  status    StudentStatus
+  startDate DateTime
+  endDate   DateTime? // Null means currently active in this status
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@map("status_histories")
+}
