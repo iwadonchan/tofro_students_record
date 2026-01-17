@@ -1,49 +1,49 @@
-# HS-SIMS (High School Student Information Management System)
+# HS-SIMS (高校生情報管理システム)
 
-A Next.js Application for managing student records with temporal data handling.
+履歴管理（Temporal Data）機能を備えた、Next.jsベースの生徒情報管理アプリケーションです。
 
-## Tech Stack
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Database**: PostgreSQL
+## 技術スタック
+- **フレームワーク**: Next.js 14 (App Router)
+- **言語**: TypeScript
+- **データベース**: PostgreSQL
 - **ORM**: Prisma
 - **UI**: Tailwind CSS + shadcn/ui
 
-## Features
-1. **Temporal Data Management**: Tracks history of changes (Address, Name, etc.) with effective dates.
-2. **Dual Name Support**: Toggles between Legal Name and Alias Name.
-3. **Bulk Promotion**: Spreadsheet-like interface for year-end processing.
-4. **Fast Search**: Client-side filtering for instant results.
+## 主な機能
+1. **履歴管理 (Temporal Data)**: 住所や氏名などの変更履歴を発効日ベースで追跡。
+2. **氏名切り替え機能**: 本名と通称（旧姓や芸名など）をトグルで表示切り替え可能。
+3. **年次更新（一括進級）**: スプレッドシート形式のインターフェースで、次年度の在籍情報を一括作成。
+4. **高速検索**: クライアントサイドフィルタリングによる即時検索結果表示。
 
-## Setup Instructions
+## セットアップ手順
 
-1. **Install Dependencies**
+1. **依存関係のインストール**
    ```bash
    npm install
    ```
 
-2. **Database Setup**
-   Ensure you have a PostgreSQL database running. Update `.env` with your connection string:
+2. **データベースの設定**
+   PostgreSQLデータベースが稼働していることを確認し、`.env` ファイルの接続文字列を更新してください：
    ```env
    DATABASE_URL="postgresql://user:password@localhost:5432/hs_sims?schema=public"
    ```
 
-3. **Initialize Database**
+3. **データベースの初期化**
    ```bash
    npx prisma migrate dev --name init
    ```
 
-4. **Run Development Server**
+4. **開発サーバーの起動**
    ```bash
    npm run dev
    ```
 
-## Key Components
-- `src/app/page.tsx`: Student Dashboard (KPIs & Search)
-- `src/app/students/[id]/page.tsx`: Student Detail (Profile & Timeline)
-- `src/app/promotion/page.tsx`: Bulk Promotion Interface
-- `src/lib/prisma.ts`: Prisma Client Singleton
+## 主要コンポーネント
+- `src/app/page.tsx`: 生徒ダッシュボード (KPI表示 & 検索)
+- `src/app/students/[id]/page.tsx`: 生徒詳細 (プロフィール & タイムライン表示)
+- `src/app/promotion/page.tsx`: 一括進級処理用インターフェース
+- `src/lib/prisma.ts`: Prismaクライアント・シングルトン
 
-## Notes on Architecture
-- **Data History**: Changes to critical fields are stored in `DataHistory` table. The UI displays the chronological timeline of these changes.
-- **Year-End Logic**: The `/api/promotion` endpoint handles the logic of copying current Enrollments to the next Fiscal Year.
+## アーキテクチャの概要
+- **データ履歴 (Data History)**: 重要な項目の変更は `DataHistory` テーブルに保存され、UIではこれらの変更を時系列（タイムライン）で表示します。
+- **年度更新ロジック**: `/api/promotion` エンドポイントが、現在の在籍情報を次年度へコピー（進級処理）するロジックを担当します。
